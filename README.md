@@ -88,8 +88,8 @@ This is an example of how you use the modules on your local computer.
 
 ### Prerequisites
 * An execution enviroment of Python3 on Linux, MacOS, or WSL2 on Windows
-* `numpy`, `scipy`, and `jax` modules
-* Update the Python3 and modules to the latest stable version (recommended).
+* Installation of `jax` module, and optionally `ipykernel` module if you execute JupyterNotebook files.
+* The author tested the codes using Python 3.12.8 on Windows 11 machine and Python 3.12.9 on WSL (Ubuntu).
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Installation
@@ -190,7 +190,7 @@ Here is the workflow for an example of 5-dimensional x-space (N=5):
     %timeit s5D_fun(x) # function and it's gradient evaluation
     %timeit s5D_fun_jitted(x) # function and it's gradient evaluation (jitted)
     ```
-The jitted version will be faster by 2-3 orders of magnitude than non-jitted version.
+The jitted version will be faster by 1-3 orders of magnitude than non-jitted version.
 
 Please run the `caller.py` for executing the above example.
 

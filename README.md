@@ -31,7 +31,7 @@
 <br />
 <br />
 
-  <span style="color:red;">The old repository of this project (ndimsplinejax@nmoteki) has moved here as my old github account "nmoteki" is no longer maintained.</span>
+🚛The old repository of this project (**ndimsplinejax@nmoteki**) has moved here as my old github account **nmoteki** is no longer maintained!
 
 </div>
 

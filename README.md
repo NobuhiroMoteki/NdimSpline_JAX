@@ -190,7 +190,7 @@ Here is the workflow for an example of 5-dimensional x-space (N=5):
     %timeit s5D_fun(x) # function and it's gradient evaluation
     %timeit s5D_fun_jitted(x) # function and it's gradient evaluation (jitted)
     ```
-The jitted version will be faster by 1-3 orders of magnitude than non-jitted version. I observed that the difference was larger for smaller n (number of grid points).
+The jitted version will be faster by 1-3 orders of magnitude than non-jitted version. I observed that the difference was more drastic at smaller n values (i.e., number of grid points).
 
 For executing this example, just run the `caller.ipynb` on JupyterNotebook or excetute the `caller.py` script.
 

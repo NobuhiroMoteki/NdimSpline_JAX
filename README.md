@@ -84,12 +84,12 @@ There have been many interpolation code/software available; however, I didn't fi
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you use the modules on your local computer.
+This is an example of how you use the modules on your local computer. The author tested the codes using Python 3.12.8 on Windows 11 machine and Python 3.12.9 on WSL (Ubuntu).
 
 ### Prerequisites
-* An execution enviroment of Python3 on Linux, MacOS, or WSL2 on Windows
+* An execution enviroment of Python >= 3.12 on Linux, MacOS, or WSL2 on Windows
 * Installation of `jax` module, and optionally `ipykernel` module if you execute JupyterNotebook files.
-* The author tested the codes using Python 3.12.8 on Windows 11 machine and Python 3.12.9 on WSL (Ubuntu).
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Installation

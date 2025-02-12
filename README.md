@@ -190,15 +190,15 @@ Here is the workflow for an example of 5-dimensional x-space (N=5):
     %timeit s5D_fun(x) # function and it's gradient evaluation
     %timeit s5D_fun_jitted(x) # function and it's gradient evaluation (jitted)
     ```
-The jitted version will be faster by 1-3 orders of magnitude than non-jitted version.
+The jitted version will be faster by 1-3 orders of magnitude than non-jitted version. I observed that the difference was larger for smaller n (number of grid points).
 
-Please run the `caller.py` for executing the above example.
+For executing this example, just run the `caller.ipynb` on JupyterNotebook or excetute the `caller.py` script.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-## Jupyter Notebook version
-In addition to the above `SplineCoefs_from_GriddedData` and `SplineInterpolant` modules callable from the `caller.py` or any user's Python codes, this project also includes `.ipynb` files scripting the individual dimensional cases. These `.ipynb` files would be useful for user's understandings or customizations.
+## Supplemental materials
+The `./jupyter_notebooks` subfolder contains `.ipynb` files scripting the individual dimensional cases. These files would help user's understandings or customizations.
 
 
 ## Reference

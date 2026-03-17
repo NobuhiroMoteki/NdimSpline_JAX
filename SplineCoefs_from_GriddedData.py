@@ -267,7 +267,7 @@ class SplineCoefs_from_GriddedData:
                             B[1:self.n[k]-2]=c_i1q2q3q4q5[i1,2:self.n[k]-1,q3,q4,q5]
                             sol= linalg.solve(A, B)
                             c_i1i2q3q4q5[i1,2:self.n[k]+1,q3,q4,q5]= sol
-                            c_i1i2q3q4q5[i1,0,q3,q4]= 2*c_i1i2q3q4q5[i1,1,q3,q4,q5]-c_i1i2q3q4q5[i1,2,q3,q4,q5]
+                            c_i1i2q3q4q5[i1,0,q3,q4,q5]= 2*c_i1i2q3q4q5[i1,1,q3,q4,q5]-c_i1i2q3q4q5[i1,2,q3,q4,q5]
                             c_i1i2q3q4q5[i1,self.n[k]+2,q3,q4,q5]= 2*c_i1i2q3q4q5[i1,self.n[k]+1,q3,q4,q5]-c_i1i2q3q4q5[i1,self.n[k],q3,q4,q5]
                             
 

@@ -77,6 +77,25 @@ There have been many interpolation code/software available; however, I didn't fi
 #### Comments:
 * The requirement of "equidistant grid-points on each axis" would not be a serious limitation in practice. A user can project/approximate a non-equidistant gridded data to equidistant gridded data by a mathematical transformation of each variable.
 
+### Performance (v2.0 vs v1.x)
+
+Benchmarked on 5D data with `n = [10, 10, 10, 10, 10]` (11 grid points per axis), CPU (WSL2), float64. All JIT timings are post-warmup averages over 1000 calls.
+
+| Operation | v1.x (old) | v2.0 (new) | Speedup |
+|---|---|---|---|
+| Coefficient computation | 96.6 s | 0.61 s | **158x** |
+| JIT eval | 3.1 ms | 106 us | **30x** |
+| JIT grad | 113.5 ms | 111 us | **1,022x** |
+| JIT value_and_grad | 113.4 ms | 108 us | **1,046x** |
+
+| Operation | v1.x (old) | v2.0 (new) |
+|---|---|---|
+| Coefficient computation (peak memory) | 16.8 MB | 1.6 MB |
+
+Key improvements:
+* **Coefficient computation**: Separable tensor-product TDMA solver replaces dense `scipy.linalg.solve` — O(N·M<sup>N+1</sup>) vs O(M<sup>3N</sup>).
+* **Evaluation / gradient**: Localized `dynamic_slice` extracts only 4<sup>N</sup> = 1,024 coefficients per query, instead of scanning all (n+3)<sup>5</sup> = 371,293 entries.
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -148,6 +167,11 @@ Here is the workflow for an example of 5-dimensional x-space (N=5):
 For executing this example, just run the `caller.ipynb` on JupyterNotebook or execute the `caller.py` script.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+## Technical Note
+
+For a detailed description of the mathematical theory (B-spline formulation, tridiagonal system, Kronecker factorization, localized evaluation) and the mapping to the implementation, see **[technical_note_theory.md](technical_note_theory.md)**.
 
 
 ## Supplemental materials

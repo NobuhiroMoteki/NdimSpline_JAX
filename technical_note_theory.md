@@ -189,7 +189,7 @@ A^{(d)} \, \mathcal{C}^{(d)} = \mathcal{C}^{(d-1)} \quad (d = 1, 2, \ldots, N), 
 \mathcal{C} = \mathcal{C}^{(N)}. \qquad \textit{(17c)}
 ```
 
-In Eq. (17b), the solve is performed along axis $d$: for each fixed combination of indices along all axes other than $d$, extract the 1D vector along axis $d$, apply the full 1D solve procedure (boundary conditions Eq. (9)–(10) and TDMA Eq. (11)–(12)), and store the result.
+In Eq. (17b), the notation $A^{(d)}$ is used as shorthand for the full 1D spline solve operator along axis $d$, which includes not only the tridiagonal matrix solve (Eq. (7), (11)–(12)) but also the boundary condition computation (Eq. (9)–(10)). Concretely, for each fixed combination of indices along all axes other than $d$, extract the 1D vector along axis $d$, apply the complete 1D solve procedure, and store the result.
 
 **Complexity analysis.** At step $d$, the tensor has $\prod_{j \ne d} n_j$ independent 1D problems, each of size $O(n_d)$. The total cost is:
 

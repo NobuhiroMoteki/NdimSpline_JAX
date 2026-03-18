@@ -21,18 +21,14 @@ This document provides a self-contained description of the mathematical theory b
 
 Consider a scalar function $f$ sampled at $n + 1$ equidistant grid points on the interval $[a, b]$:
 
-**(1)**
-
 ```math
-x_k = a + k h, \quad k = 0, 1, \ldots, n, \quad h = \frac{b - a}{n}.
+x_k = a + k h, \quad k = 0, 1, \ldots, n, \quad h = \frac{b - a}{n}. \qquad \textit{(1)}
 ```
 
 The data values are:
 
-**(2)**
-
 ```math
-y_k = f(x_k), \quad k = 0, 1, \ldots, n.
+y_k = f(x_k), \quad k = 0, 1, \ldots, n. \qquad \textit{(2)}
 ```
 
 We seek a piecewise cubic polynomial $s(x)$ satisfying:
@@ -45,26 +41,20 @@ We seek a piecewise cubic polynomial $s(x)$ satisfying:
 
 The interpolant is expressed as a linear combination of cubic B-spline basis functions (de Boor, 1978):
 
-**(3)**
-
 ```math
-s(x) = \sum_{i=0}^{n+2} c_i \, B_i(x),
+s(x) = \sum_{i=0}^{n+2} c_i \, B_i(x), \qquad \textit{(3)}
 ```
 
 where $c_i$ are the $n + 3$ unknown coefficients. The cubic B-spline basis function $B_i(x)$ is a piecewise cubic with local support, centered at the knot $x_{i-1}$. In normalized form with $t = |(x - x_{i-1}) / h|$, the cardinal B-spline is:
 
-**(4)**
-
 ```math
-\beta(t) = \begin{cases} 4 - 6t^2 + 3t^3 & \text{if } 0 \le t \le 1 \\ (2 - t)^3 & \text{if } 1 < t < 2 \\ 0 & \text{if } t \ge 2 \end{cases}
+\beta(t) = \begin{cases} 4 - 6t^2 + 3t^3 & \text{if } 0 \le t \le 1 \\ (2 - t)^3 & \text{if } 1 < t < 2 \\ 0 & \text{if } t \ge 2 \end{cases} \qquad \textit{(4)}
 ```
 
 so that
 
-**(5)**
-
 ```math
-B_i(x) = \beta\!\left(\left|\frac{x - x_{i-1}}{h}\right|\right).
+B_i(x) = \beta\!\left(\left|\frac{x - x_{i-1}}{h}\right|\right). \qquad \textit{(5)}
 ```
 
 Each $B_i$ is nonzero only on a support of width $4h$ and is $C^2$ everywhere. Importantly, at any point $x \in [x_k, x_{k+1}]$, at most 4 basis functions are nonzero: $B_k$, $B_{k+1}$, $B_{k+2}$, $B_{k+3}$.
@@ -74,18 +64,14 @@ Each $B_i$ is nonzero only on a support of width $4h$ and is $C^2$ everywhere. I
 
 Substituting the interpolation condition $s(x_k) = y_k$ into Eq. (3) and evaluating the B-splines at the grid points (using the values $\beta(0) = 4$, $\beta(1) = 1$, $\beta(2) = 0$):
 
-**(6)**
-
 ```math
-c_{k} + 4 c_{k+1} + c_{k+2} = y_k, \quad k = 0, 1, \ldots, n.
+c_{k} + 4 c_{k+1} + c_{k+2} = y_k, \quad k = 0, 1, \ldots, n. \qquad \textit{(6)}
 ```
 
 This gives $n + 1$ equations for $n + 3$ unknowns. The two additional degrees of freedom are fixed by boundary conditions (Section 4). The interior equations ($k = 1, \ldots, n - 1$) form the tridiagonal linear system:
 
-**(7)**
-
 ```math
-\underbrace{\begin{pmatrix} 4 & 1 & & \\ 1 & 4 & 1 & \\ & \ddots & \ddots & \ddots \\ & & 1 & 4 \end{pmatrix}}_{A \;\in\; \mathbb{R}^{(n-1)\times(n-1)}} \begin{pmatrix} c_2 \\ c_3 \\ \vdots \\ c_n \end{pmatrix} = \begin{pmatrix} y_1 - c_1 \\ y_2 \\ \vdots \\ y_{n-1} - c_{n+1} \end{pmatrix},
+\underbrace{\begin{pmatrix} 4 & 1 & & \\ 1 & 4 & 1 & \\ & \ddots & \ddots & \ddots \\ & & 1 & 4 \end{pmatrix}}_{A \;\in\; \mathbb{R}^{(n-1)\times(n-1)}} \begin{pmatrix} c_2 \\ c_3 \\ \vdots \\ c_n \end{pmatrix} = \begin{pmatrix} y_1 - c_1 \\ y_2 \\ \vdots \\ y_{n-1} - c_{n+1} \end{pmatrix}, \qquad \textit{(7)}
 ```
 
 where $c_1$ and $c_{n+1}$ are determined by the boundary conditions.
@@ -94,46 +80,34 @@ where $c_1$ and $c_{n+1}$ are determined by the boundary conditions.
 
 The natural spline condition $s''(a) = 0$ and $s''(b) = 0$ translates, via the second derivative of the B-spline expansion, to:
 
-**(8a)**
-
 ```math
-c_0 - 2c_1 + c_2 = 0,
+c_0 - 2c_1 + c_2 = 0, \qquad \textit{(8a)}
 ```
 
-**(8b)**
-
 ```math
-c_n - 2c_{n+1} + c_{n+2} = 0.
+c_n - 2c_{n+1} + c_{n+2} = 0. \qquad \textit{(8b)}
 ```
 
 From Eq. (6) with $k = 0$: $c_0 + 4c_1 + c_2 = y_0$. Adding this to Eq. (8a) gives $6c_1 = y_0$, hence:
 
-**(9a)**
-
 ```math
-c_1 = \frac{y_0}{6}.
+c_1 = \frac{y_0}{6}. \qquad \textit{(9a)}
 ```
 
 Similarly, from Eq. (6) with $k = n$ and Eq. (8b):
 
-**(9b)**
-
 ```math
-c_{n+1} = \frac{y_n}{6}.
+c_{n+1} = \frac{y_n}{6}. \qquad \textit{(9b)}
 ```
 
 The boundary coefficients are then:
 
-**(10a)**
-
 ```math
-c_0 = 2c_1 - c_2,
+c_0 = 2c_1 - c_2, \qquad \textit{(10a)}
 ```
 
-**(10b)**
-
 ```math
-c_{n+2} = 2c_{n+1} - c_n.
+c_{n+2} = 2c_{n+1} - c_n. \qquad \textit{(10b)}
 ```
 
 With $c_1$ and $c_{n+1}$ known from Eq. (9), the right-hand side of Eq. (7) is fully determined, and the $n - 1$ interior coefficients $c_2, \ldots, c_n$ are obtained by solving the tridiagonal system. Finally, $c_0$ and $c_{n+2}$ are computed from Eq. (10).
@@ -143,34 +117,26 @@ With $c_1$ and $c_{n+1}$ known from Eq. (9), the right-hand side of Eq. (7) is f
 
 The matrix $A$ in Eq. (7) is symmetric, tridiagonal, and strictly diagonally dominant ($|4| > |1| + |1|$), guaranteeing the existence of a unique solution and numerical stability without pivoting.
 
-The Thomas algorithm (Tridiagonal Matrix Algorithm, TDMA) solves $A\mathbf{x} = \mathbf{d}$ in $O(m)$ operations for an $m \times m$ tridiagonal system. For the specific (1, 4, 1) structure:
+The Thomas algorithm (Tridiagonal Matrix Algorithm, TDMA) solves $A\boldsymbol{x} = \boldsymbol{d}$ in $O(m)$ operations for an $m \times m$ tridiagonal system. For the specific (1, 4, 1) structure:
 
 **Forward sweep** ($i = 1, 2, \ldots, m - 1$):
 
-**(11a)**
-
 ```math
-w_0 = 4, \quad g_0 = \frac{d_0}{w_0},
+w_0 = 4, \quad g_0 = \frac{d_0}{w_0}, \qquad \textit{(11a)}
 ```
 
-**(11b)**
-
 ```math
-w_i = 4 - \frac{1}{w_{i-1}}, \quad g_i = \frac{d_i - g_{i-1}}{w_i}.
+w_i = 4 - \frac{1}{w_{i-1}}, \quad g_i = \frac{d_i - g_{i-1}}{w_i}. \qquad \textit{(11b)}
 ```
 
 **Backward substitution** ($i = m - 2, m - 3, \ldots, 0$):
 
-**(12a)**
-
 ```math
-x_{m-1} = g_{m-1},
+x_{m-1} = g_{m-1}, \qquad \textit{(12a)}
 ```
 
-**(12b)**
-
 ```math
-x_i = g_i - \frac{x_{i+1}}{w_i}.
+x_i = g_i - \frac{x_{i+1}}{w_i}. \qquad \textit{(12b)}
 ```
 
 In the implementation ([tdma.py](ndim_spline_jax/tdma.py)), both sweeps are executed with `jax.lax.scan`, which provides a JIT-compatible sequential loop with $O(1)$ memory overhead per step.
@@ -180,28 +146,22 @@ In the implementation ([tdma.py](ndim_spline_jax/tdma.py)), both sweeps are exec
 
 For an $N$-dimensional rectilinear grid with axis-$d$ having $n_d$ intervals and spacing $h_d = (b_d - a_d) / n_d$, the data tensor is:
 
-**(13)**
-
 ```math
-\mathcal{Y}_{k_1 k_2 \cdots k_N} = f(x^{(1)}_{k_1},\, x^{(2)}_{k_2},\, \ldots,\, x^{(N)}_{k_N}).
+\mathcal{Y}_{k_1 k_2 \cdots k_N} = f(x^{(1)}_{k_1},\, x^{(2)}_{k_2},\, \ldots,\, x^{(N)}_{k_N}). \qquad \textit{(13)}
 ```
 
 The tensor product spline interpolant is:
 
-**(14)**
-
 ```math
-s(\mathbf{x}) = \sum_{i_1=0}^{n_1+2} \cdots \sum_{i_N=0}^{n_N+2} \mathcal{C}_{i_1 \cdots i_N} \prod_{d=1}^{N} B^{(d)}_{i_d}(x_d),
+s(\boldsymbol{x}) = \sum_{i_1=0}^{n_1+2} \cdots \sum_{i_N=0}^{n_N+2} \mathcal{C}_{i_1 \cdots i_N} \prod_{d=1}^{N} B^{(d)}_{i_d}(x_d), \qquad \textit{(14)}
 ```
 
 where $B^{(d)}_{i_d}$ is the 1D B-spline basis for axis $d$, and $\mathcal{C}$ is the coefficient tensor of shape $(n_1+3) \times \cdots \times (n_N+3)$.
 
-The interpolation conditions $s(\mathbf{x}_{\mathbf{k}}) = \mathcal{Y}_{\mathbf{k}}$ at all grid points, together with natural boundary conditions on each axis, yield the global linear system:
-
-**(15)**
+The interpolation conditions $s(\boldsymbol{x}_{\boldsymbol{k}}) = \mathcal{Y}_{\boldsymbol{k}}$ at all grid points, together with natural boundary conditions on each axis, yield the global linear system:
 
 ```math
-(A^{(N)} \otimes \cdots \otimes A^{(2)} \otimes A^{(1)}) \, \mathrm{vec}(\mathcal{C}_{\mathrm{int}}) = \mathrm{vec}(\mathcal{D}),
+(A^{(N)} \otimes \cdots \otimes A^{(2)} \otimes A^{(1)}) \, \mathrm{vec}(\mathcal{C}_{\mathrm{int}}) = \mathrm{vec}(\mathcal{D}), \qquad \textit{(15)}
 ```
 
 where $\otimes$ denotes the Kronecker product, $A^{(d)}$ is the $(n_d - 1) \times (n_d - 1)$ tridiagonal matrix from Eq. (7) for axis $d$, $\mathcal{C}_{\mathrm{int}}$ denotes the interior coefficients, and $\mathcal{D}$ is the appropriately modified right-hand side tensor. Solving Eq. (15) directly requires $O(M^{3N})$ operations, where $M = \max_d(n_d)$, which is prohibitive for large $N$.
@@ -211,40 +171,30 @@ where $\otimes$ denotes the Kronecker product, $A^{(d)}$ is the $(n_d - 1) \time
 
 The Kronecker product structure of Eq. (15) allows factorization into $N$ sequential 1D solves (Habermann and Kindermann, 2007). The key identity is:
 
-**(16)**
-
 ```math
-(A^{(N)} \otimes \cdots \otimes A^{(1)})^{-1} = (A^{(N)})^{-1} \otimes \cdots \otimes (A^{(1)})^{-1}.
+(A^{(N)} \otimes \cdots \otimes A^{(1)})^{-1} = (A^{(N)})^{-1} \otimes \cdots \otimes (A^{(1)})^{-1}. \qquad \textit{(16)}
 ```
 
 This means the coefficient tensor can be computed iteratively:
 
-**(17a)**
-
 ```math
-\mathcal{C}^{(0)} = \mathcal{Y},
+\mathcal{C}^{(0)} = \mathcal{Y}, \qquad \textit{(17a)}
 ```
 
-**(17b)**
-
 ```math
-A^{(d)} \, \mathcal{C}^{(d)} = \mathcal{C}^{(d-1)} \quad (d = 1, 2, \ldots, N),
+A^{(d)} \, \mathcal{C}^{(d)} = \mathcal{C}^{(d-1)} \quad (d = 1, 2, \ldots, N), \qquad \textit{(17b)}
 ```
 
-**(17c)**
-
 ```math
-\mathcal{C} = \mathcal{C}^{(N)}.
+\mathcal{C} = \mathcal{C}^{(N)}. \qquad \textit{(17c)}
 ```
 
 In Eq. (17b), the solve is performed along axis $d$: for each fixed combination of indices along all axes other than $d$, extract the 1D vector along axis $d$, apply the full 1D solve procedure (boundary conditions Eq. (9)–(10) and TDMA Eq. (11)–(12)), and store the result.
 
 **Complexity analysis.** At step $d$, the tensor has $\prod_{j \ne d} n_j$ independent 1D problems, each of size $O(n_d)$. The total cost is:
 
-**(18)**
-
 ```math
-\sum_{d=1}^{N} \left(\prod_{j \ne d} n_j\right) \cdot O(n_d) = N \cdot O\!\left(\prod_{d=1}^{N} n_d\right) = O(N M^N),
+\sum_{d=1}^{N} \left(\prod_{j \ne d} n_j\right) \cdot O(n_d) = N \cdot O\!\left(\prod_{d=1}^{N} n_d\right) = O(N M^N), \qquad \textit{(18)}
 ```
 
 where we used the approximation $n_d \approx M$ for all $d$. Compared to $O(M^{3N})$ for direct solve, this is a dramatic reduction.
@@ -254,60 +204,46 @@ where we used the approximation $n_d \approx M$ for all $d$. Compared to $O(M^{3
 
 ## 8. Localized Evaluation
 
-Given a query point $\mathbf{x} \in \mathbb{R}^N$, due to the local support of B-splines (Section 2), the sum in Eq. (14) reduces to only $4^N$ nonzero terms. For each dimension $d$:
+Given a query point $\boldsymbol{x} \in \mathbb{R}^N$, due to the local support of B-splines (Section 2), the sum in Eq. (14) reduces to only $4^N$ nonzero terms. For each dimension $d$:
 
 **Step 1. Locate the interval**: compute the normalized coordinate $u_d = (x_d - a_d) / h_d$ and the interval index:
 
-**(19)**
-
 ```math
-k_d = \mathrm{clip}\!\left(\lfloor u_d \rfloor,\; 0,\; n_d - 1\right).
+k_d = \mathrm{clip}\!\left(\lfloor u_d \rfloor,\; 0,\; n_d - 1\right). \qquad \textit{(19)}
 ```
 
 **Step 2. Compute local basis values**: define the fractional position $\tau_d = u_d - k_d \in [0, 1)$. The 4 nonzero basis values are:
 
-**(20)**
-
 ```math
-\phi^{(d)}_0 = \beta(|\tau_d + 1|), \quad \phi^{(d)}_1 = \beta(|\tau_d|), \quad \phi^{(d)}_2 = \beta(|\tau_d - 1|), \quad \phi^{(d)}_3 = \beta(|\tau_d - 2|),
+\phi^{(d)}_0 = \beta(|\tau_d + 1|), \quad \phi^{(d)}_1 = \beta(|\tau_d|), \quad \phi^{(d)}_2 = \beta(|\tau_d - 1|), \quad \phi^{(d)}_3 = \beta(|\tau_d - 2|), \qquad \textit{(20)}
 ```
 
 corresponding to coefficient indices $k_d, \; k_d+1, \; k_d+2, \; k_d+3$.
 
 **Step 3. Extract local coefficients**: use `jax.lax.dynamic_slice` to extract the $4 \times 4 \times \cdots \times 4$ sub-tensor:
 
-**(21)**
-
 ```math
-\mathcal{C}_{\mathrm{local}} = \mathcal{C}[k_1 : k_1\!+\!4, \; k_2 : k_2\!+\!4, \; \ldots, \; k_N : k_N\!+\!4].
+\mathcal{C}_{\mathrm{local}} = \mathcal{C}[k_1 : k_1\!+\!4, \; k_2 : k_2\!+\!4, \; \ldots, \; k_N : k_N\!+\!4]. \qquad \textit{(21)}
 ```
 
 **Step 4. Tensor contraction**: the interpolated value is:
 
-**(22)**
-
 ```math
-s(\mathbf{x}) = \sum_{j_1=0}^{3} \cdots \sum_{j_N=0}^{3} \mathcal{C}_{\mathrm{local},\, j_1 \cdots j_N} \prod_{d=1}^{N} \phi^{(d)}_{j_d}.
+s(\boldsymbol{x}) = \sum_{j_1=0}^{3} \cdots \sum_{j_N=0}^{3} \mathcal{C}_{\mathrm{local},\, j_1 \cdots j_N} \prod_{d=1}^{N} \phi^{(d)}_{j_d}. \qquad \textit{(22)}
 ```
 
 This is implemented as a sequence of tensor-vector contractions:
 
-**(23a)**
-
 ```math
-\mathcal{R}^{(0)} = \mathcal{C}_{\mathrm{local}},
+\mathcal{R}^{(0)} = \mathcal{C}_{\mathrm{local}}, \qquad \textit{(23a)}
 ```
 
-**(23b)**
-
 ```math
-\mathcal{R}^{(d)} = \sum_{j_d=0}^{3} \mathcal{R}^{(d-1)}_{j_d, \ldots} \; \phi^{(d)}_{j_d}, \quad d = 1, \ldots, N,
+\mathcal{R}^{(d)} = \sum_{j_d=0}^{3} \mathcal{R}^{(d-1)}_{j_d, \ldots} \; \phi^{(d)}_{j_d}, \quad d = 1, \ldots, N, \qquad \textit{(23b)}
 ```
 
-**(23c)**
-
 ```math
-s(\mathbf{x}) = \mathcal{R}^{(N)} \in \mathbb{R}.
+s(\boldsymbol{x}) = \mathcal{R}^{(N)} \in \mathbb{R}. \qquad \textit{(23c)}
 ```
 
 Each contraction reduces the tensor rank by one. This is implemented with `jnp.tensordot(result, basis, axes=([0], [0]))`.

@@ -69,8 +69,8 @@ Interpolant is an efficiently-computable mathematical function that models a dis
 There have been many interpolation code/software available; however, I didn't find any multidimensional interpolant compatible with both Just-In-Time compilation and Automatic Differentiation when I starded this project in mid 2022. In my research, I needed such interpolant for applying a recent Hamiltonian-MC code to my Bayesian inverse problem wherein the forward model is only accessible through a pre-computed discrete look-up table. In that case, the forward model, a light-scattering simulator for nonspherical particles, is computationally too complex to execute in place. So, I decided to develop this NdimSpline_JAX. I'd like to share the codes hoping they are useful for scientists and engineers.
 
 ### Functionalities:
-* `compute_coefs` computes the natural-cubic spline coefficients from scalar y data on an N-dimensional Cartesian grid, using a separable tensor-product approach with O(N M^{N+1}) complexity.
-* `make_interpolant` creates a JIT & Autograd compatible interpolant that uses localized evaluation (only 4^N coefficients per query point).
+* `compute_coefs` computes the natural-cubic spline coefficients from scalar y data on an N-dimensional Cartesian grid, using a separable tensor-product approach with O(N·M<sup>N+1</sup>) complexity.
+* `make_interpolant` creates a JIT & Autograd compatible interpolant that uses localized evaluation (only 4<sup>N</sup> coefficients per query point).
 * On each dimensional axis, x grid-points must be equidistant. The grid-points interval can be different among axes.
 * Works for any number of dimensions N (no hardcoded dimension limit).
 

@@ -171,7 +171,7 @@ For executing this example, just run the `caller.ipynb` on JupyterNotebook or ex
 
 ## Technical Note
 
-For a detailed description of the mathematical theory (B-spline formulation, tridiagonal system, Kronecker factorization, localized evaluation) and the mapping to the implementation, see **[technical_note_theory.md](technical_note_theory.md)**.
+For a detailed description of the mathematical theory (B-spline formulation, tridiagonal system, Kronecker factorization, localized evaluation) and the mapping to the implementation, see **[technical_note_theory.pdf](technical_note_theory.pdf)** (or the [markdown source](technical_note_theory.md)).
 
 
 ## Supplemental materials

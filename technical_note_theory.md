@@ -1,5 +1,8 @@
 # Technical Note: Mathematical Theory and Computational Implementation of N-dimensional Cubic Spline Interpolation
 
+**Author:** N. Moteki
+**Last updated:** 2026-03-18 (corresponds to NdimSpline_JAX v1.0.1)
+
 This document provides a self-contained description of the mathematical theory behind the N-dimensional natural cubic spline interpolation implemented in `ndim_spline_jax`. It covers the 1D formulation, the extension to N dimensions via tensor products, the efficient coefficient computation exploiting Kronecker structure, and the localized evaluation algorithm.
 
 ## Contents
@@ -272,3 +275,8 @@ Each contraction reduces the tensor rank by one. This is implemented with `jnp.t
 1. C. Habermann and F. Kindermann, "Multidimensional Spline Interpolation: Theory and Applications," *Computational Economics*, vol. 30, no. 2, pp. 153–169, 2007. DOI: [10.1007/s10614-007-9092-4](https://doi.org/10.1007/s10614-007-9092-4).
 2. C. de Boor, *A Practical Guide to Splines*, Springer, 1978.
 3. JAX Reference Documentation: https://jax.readthedocs.io/en/latest/.
+
+
+## Acknowledgment
+
+This document was prepared with the assistance of Claude (Anthropic). The author assumes full responsibility for the content.

@@ -117,7 +117,7 @@ With $c_1$ and $c_{n+1}$ known from Eq. (9), the right-hand side of Eq. (7) is f
 
 The matrix $A$ in Eq. (7) is symmetric, tridiagonal, and strictly diagonally dominant ($|4| > |1| + |1|$), guaranteeing the existence of a unique solution and numerical stability without pivoting.
 
-The Thomas algorithm (Tridiagonal Matrix Algorithm, TDMA) solves $A\boldsymbol{x} = \boldsymbol{d}$ in $O(m)$ operations for an $m \times m$ tridiagonal system. For the specific (1, 4, 1) structure:
+The Thomas algorithm (Tridiagonal Matrix Algorithm, TDMA) solves $A\mathbf{x} = \mathbf{d}$ in $O(m)$ operations for an $m \times m$ tridiagonal system. For the specific (1, 4, 1) structure:
 
 **Forward sweep** ($i = 1, 2, \ldots, m - 1$):
 
@@ -153,12 +153,12 @@ For an $N$-dimensional rectilinear grid with axis-$d$ having $n_d$ intervals and
 The tensor product spline interpolant is:
 
 ```math
-s(\boldsymbol{x}) = \sum_{i_1=0}^{n_1+2} \cdots \sum_{i_N=0}^{n_N+2} \mathcal{C}_{i_1 \cdots i_N} \prod_{d=1}^{N} B^{(d)}_{i_d}(x_d), \qquad \textit{(14)}
+s(\mathbf{x}) = \sum_{i_1=0}^{n_1+2} \cdots \sum_{i_N=0}^{n_N+2} \mathcal{C}_{i_1 \cdots i_N} \prod_{d=1}^{N} B^{(d)}_{i_d}(x_d), \qquad \textit{(14)}
 ```
 
 where $B^{(d)}_{i_d}$ is the 1D B-spline basis for axis $d$, and $\mathcal{C}$ is the coefficient tensor of shape $(n_1+3) \times \cdots \times (n_N+3)$.
 
-The interpolation conditions $s(\boldsymbol{x}_{\boldsymbol{k}}) = \mathcal{Y}_{\boldsymbol{k}}$ at all grid points, together with natural boundary conditions on each axis, yield the global linear system:
+The interpolation conditions $s(\mathbf{x}_{\mathbf{k}}) = \mathcal{Y}_{\mathbf{k}}$ at all grid points, together with natural boundary conditions on each axis, yield the global linear system:
 
 ```math
 (A^{(N)} \otimes \cdots \otimes A^{(2)} \otimes A^{(1)}) \, \mathrm{vec}(\mathcal{C}_{\mathrm{int}}) = \mathrm{vec}(\mathcal{D}), \qquad \textit{(15)}
@@ -204,7 +204,7 @@ where we used the approximation $n_d \approx M$ for all $d$. Compared to $O(M^{3
 
 ## 8. Localized Evaluation
 
-Given a query point $\boldsymbol{x} \in \mathbb{R}^N$, due to the local support of B-splines (Section 2), the sum in Eq. (14) reduces to only $4^N$ nonzero terms. For each dimension $d$:
+Given a query point $\mathbf{x} \in \mathbb{R}^N$, due to the local support of B-splines (Section 2), the sum in Eq. (14) reduces to only $4^N$ nonzero terms. For each dimension $d$:
 
 **Step 1. Locate the interval**: compute the normalized coordinate $u_d = (x_d - a_d) / h_d$ and the interval index:
 
@@ -229,7 +229,7 @@ corresponding to coefficient indices $k_d, \; k_d+1, \; k_d+2, \; k_d+3$.
 **Step 4. Tensor contraction**: the interpolated value is:
 
 ```math
-s(\boldsymbol{x}) = \sum_{j_1=0}^{3} \cdots \sum_{j_N=0}^{3} \mathcal{C}_{\mathrm{local},\, j_1 \cdots j_N} \prod_{d=1}^{N} \phi^{(d)}_{j_d}. \qquad \textit{(22)}
+s(\mathbf{x}) = \sum_{j_1=0}^{3} \cdots \sum_{j_N=0}^{3} \mathcal{C}_{\mathrm{local},\, j_1 \cdots j_N} \prod_{d=1}^{N} \phi^{(d)}_{j_d}. \qquad \textit{(22)}
 ```
 
 This is implemented as a sequence of tensor-vector contractions:
@@ -243,7 +243,7 @@ This is implemented as a sequence of tensor-vector contractions:
 ```
 
 ```math
-s(\boldsymbol{x}) = \mathcal{R}^{(N)} \in \mathbb{R}. \qquad \textit{(23c)}
+s(\mathbf{x}) = \mathcal{R}^{(N)} \in \mathbb{R}. \qquad \textit{(23c)}
 ```
 
 Each contraction reduces the tensor rank by one. This is implemented with `jnp.tensordot(result, basis, axes=([0], [0]))`.

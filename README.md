@@ -77,18 +77,18 @@ There have been many interpolation code/software available; however, I didn't fi
 #### Comments:
 * The requirement of "equidistant grid-points on each axis" would not be a serious limitation in practice. A user can project/approximate a non-equidistant gridded data to equidistant gridded data by a mathematical transformation of each variable.
 
-### Performance (v2.0 vs v1.x)
+### Performance (v1.0.1 vs v0.1.2)
 
 Benchmarked on 5D data with `n = [10, 10, 10, 10, 10]` (11 grid points per axis), CPU (WSL2), float64. All JIT timings are post-warmup averages over 1000 calls.
 
-| Operation | v1.x (old) | v2.0 (new) | Speedup |
+| Operation | v0.1.2 (old) | v1.0.1 (new) | Speedup |
 |---|---|---|---|
 | Coefficient computation | 96.6 s | 0.61 s | **158x** |
 | JIT eval | 3.1 ms | 106 us | **30x** |
 | JIT grad | 113.5 ms | 111 us | **1,022x** |
 | JIT value_and_grad | 113.4 ms | 108 us | **1,046x** |
 
-| Operation | v1.x (old) | v2.0 (new) |
+| Operation | v0.1.2 (old) | v1.0.1 (new) |
 |---|---|---|
 | Coefficient computation (peak memory) | 16.8 MB | 1.6 MB |
 

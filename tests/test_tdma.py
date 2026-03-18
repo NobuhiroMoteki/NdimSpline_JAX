@@ -22,7 +22,7 @@ import jax.numpy as jnp
 from scipy import linalg
 
 from ndim_spline_jax.tdma import tdma_solve, solve_1d_spline, solve_along_axis, compute_coefs
-from SplineCoefs_from_GriddedData import SplineCoefs_from_GriddedData
+from legacy.SplineCoefs_from_GriddedData import SplineCoefs_from_GriddedData
 
 
 # --- Test data generators ---

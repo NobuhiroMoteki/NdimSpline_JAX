@@ -22,8 +22,8 @@ import jax.numpy as jnp
 
 from ndim_spline_jax.tdma import compute_coefs
 from ndim_spline_jax.interpolant import make_interpolant
-from SplineCoefs_from_GriddedData import SplineCoefs_from_GriddedData
-from SplineInterpolant import SplineInterpolant
+from legacy.SplineCoefs_from_GriddedData import SplineCoefs_from_GriddedData
+from legacy.SplineInterpolant import SplineInterpolant
 
 
 def make_nd_data(dims, n_intervals):

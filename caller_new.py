@@ -17,8 +17,8 @@ from jax import jit, grad, value_and_grad
 from ndim_spline_jax import compute_coefs, make_interpolant
 
 # --- Old API imports (for benchmark comparison) ---
-from SplineCoefs_from_GriddedData import SplineCoefs_from_GriddedData
-from SplineInterpolant import SplineInterpolant
+from legacy.SplineCoefs_from_GriddedData import SplineCoefs_from_GriddedData
+from legacy.SplineInterpolant import SplineInterpolant
 
 
 # ============================================================

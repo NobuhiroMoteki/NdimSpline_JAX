@@ -3,3 +3,12 @@ myenv/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# LaTeX build artifacts
+docs/*.aux
+docs/*.log
+docs/*.fls
+docs/*.fdb_latexmk
+docs/*.out
+docs/*.toc
+docs/*.synctex.gz

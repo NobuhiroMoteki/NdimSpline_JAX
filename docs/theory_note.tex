@@ -1,0 +1,386 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{physics}
+\usepackage{bm}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+% Table style
+\renewcommand{\arraystretch}{1.6}
+
+\title{Technical Note: Mathematical Theory and Computational Implementation\\
+of $N$-dimensional Cubic Spline Interpolation}
+\author{N.\ Moteki}
+\date{Last updated: 2026-03-19\\Corresponds to \texttt{NdimSpline\_JAX} v1.0.1}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This document provides a self-contained description of the mathematical theory
+behind the $N$-dimensional natural cubic spline interpolation implemented in
+\texttt{ndim\_spline\_jax}. It covers the 1D formulation, the extension to
+$N$ dimensions via tensor products, the efficient coefficient computation
+exploiting Kronecker structure, and the localized evaluation algorithm.
+\end{abstract}
+
+\tableofcontents
+
+%----------------------------------------------------------------------
+\section{1D Natural Cubic Spline}
+%----------------------------------------------------------------------
+
+Consider a scalar function $f$ sampled at $n + 1$ equidistant grid points
+on the interval $[a, b]$:
+\begin{equation}\label{eq:grid}
+  x_k = a + k h, \quad k = 0, 1, \ldots, n, \quad h = \frac{b - a}{n}.
+\end{equation}
+
+The data values are:
+\begin{equation}\label{eq:data}
+  y_k = f(x_k), \quad k = 0, 1, \ldots, n.
+\end{equation}
+
+We seek a piecewise cubic polynomial $s(x)$ satisfying:
+\begin{itemize}[nosep]
+  \item \textbf{Interpolation:} $s(x_k) = y_k$ for all $k = 0, \ldots, n$.
+  \item \textbf{Smoothness:} $s \in C^2[a, b]$, i.e., $s$, $s'$, and $s''$ are all continuous.
+  \item \textbf{Natural boundary conditions:} $s''(a) = s''(b) = 0$.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\section{B-spline Representation}
+%----------------------------------------------------------------------
+
+The interpolant is expressed as a linear combination of cubic B-spline
+basis functions \cite{deBoor1978}:
+\begin{equation}\label{eq:bspline-expansion}
+  s(x) = \sum_{i=0}^{n+2} c_i \, B_i(x),
+\end{equation}
+where $c_i$ are the $n + 3$ unknown coefficients. The cubic B-spline basis
+function $B_i(x)$ is a piecewise cubic with local support, centered at the
+knot $x_{i-1}$. In normalized form with $t = |(x - x_{i-1}) / h|$, the
+cardinal B-spline is:
+\begin{equation}\label{eq:beta}
+  \beta(t) = \begin{cases}
+    4 - 6t^2 + 3t^3 & \text{if } 0 \le t \le 1, \\
+    (2 - t)^3        & \text{if } 1 < t < 2, \\
+    0                & \text{if } t \ge 2,
+  \end{cases}
+\end{equation}
+so that
+\begin{equation}\label{eq:Bi}
+  B_i(x) = \beta\!\left(\left|\frac{x - x_{i-1}}{h}\right|\right).
+\end{equation}
+
+Each $B_i$ is nonzero only on a support of width $4h$ and is $C^2$
+everywhere. Importantly, at any point $x \in [x_k, x_{k+1}]$, at most
+4 basis functions are nonzero: $B_k$, $B_{k+1}$, $B_{k+2}$, $B_{k+3}$.
+
+%----------------------------------------------------------------------
+\section{Coefficient Equations and Tridiagonal System}
+%----------------------------------------------------------------------
+
+Substituting the interpolation condition $s(x_k) = y_k$ into
+\eqref{eq:bspline-expansion} and evaluating the B-splines at the grid
+points (using the values $\beta(0) = 4$, $\beta(1) = 1$, $\beta(2) = 0$):
+\begin{equation}\label{eq:interp-cond}
+  c_{k} + 4 c_{k+1} + c_{k+2} = y_k, \quad k = 0, 1, \ldots, n.
+\end{equation}
+
+This gives $n + 1$ equations for $n + 3$ unknowns. The two additional
+degrees of freedom are fixed by boundary conditions (Section~4). The
+interior equations ($k = 1, \ldots, n - 1$) form the tridiagonal linear
+system:
+\begin{equation}\label{eq:tridiag}
+  \underbrace{\begin{pmatrix}
+    4 & 1 &        &   \\
+    1 & 4 & 1      &   \\
+      & \ddots & \ddots & \ddots \\
+      &        & 1      & 4
+  \end{pmatrix}}_{A \;\in\; \mathbb{R}^{(n-1)\times(n-1)}}
+  \begin{pmatrix} c_2 \\ c_3 \\ \vdots \\ c_n \end{pmatrix}
+  =
+  \begin{pmatrix} y_1 - c_1 \\ y_2 \\ \vdots \\ y_{n-1} - c_{n+1} \end{pmatrix},
+\end{equation}
+where $c_1$ and $c_{n+1}$ are determined by the boundary conditions.
+
+%----------------------------------------------------------------------
+\section{Natural Boundary Conditions}
+%----------------------------------------------------------------------
+
+The natural spline condition $s''(a) = 0$ and $s''(b) = 0$ translates,
+via the second derivative of the B-spline expansion, to:
+\begin{align}
+  c_0 - 2c_1 + c_2       &= 0, \label{eq:bc-left} \\
+  c_n - 2c_{n+1} + c_{n+2} &= 0. \label{eq:bc-right}
+\end{align}
+
+From \eqref{eq:interp-cond} with $k = 0$: $c_0 + 4c_1 + c_2 = y_0$.
+Adding this to \eqref{eq:bc-left} gives $6c_1 = y_0$, hence:
+\begin{equation}\label{eq:c1}
+  c_1 = \frac{y_0}{6}.
+\end{equation}
+
+Similarly, from \eqref{eq:interp-cond} with $k = n$ and \eqref{eq:bc-right}:
+\begin{equation}\label{eq:cn1}
+  c_{n+1} = \frac{y_n}{6}.
+\end{equation}
+
+The boundary coefficients are then:
+\begin{align}
+  c_0     &= 2c_1 - c_2,     \label{eq:c0} \\
+  c_{n+2} &= 2c_{n+1} - c_n. \label{eq:cn2}
+\end{align}
+
+With $c_1$ and $c_{n+1}$ known from \eqref{eq:c1}--\eqref{eq:cn1}, the
+right-hand side of \eqref{eq:tridiag} is fully determined, and the
+$n - 1$ interior coefficients $c_2, \ldots, c_n$ are obtained by solving
+the tridiagonal system. Finally, $c_0$ and $c_{n+2}$ are computed from
+\eqref{eq:c0}--\eqref{eq:cn2}.
+
+%----------------------------------------------------------------------
+\section{Thomas Algorithm (TDMA)}
+%----------------------------------------------------------------------
+
+The matrix $A$ in \eqref{eq:tridiag} is symmetric, tridiagonal, and
+strictly diagonally dominant ($|4| > |1| + |1|$), guaranteeing the
+existence of a unique solution and numerical stability without pivoting.
+
+The Thomas algorithm (Tridiagonal Matrix Algorithm, TDMA) solves
+$A\mathbf{x} = \mathbf{d}$ in $O(m)$ operations for an
+$m \times m$ tridiagonal system. For the specific $(1, 4, 1)$ structure:
+
+\textbf{Forward sweep} ($i = 1, 2, \ldots, m - 1$):
+\begin{align}
+  w_0 &= 4, \quad g_0 = \frac{d_0}{w_0}, \label{eq:fwd-init} \\
+  w_i &= 4 - \frac{1}{w_{i-1}}, \quad g_i = \frac{d_i - g_{i-1}}{w_i}. \label{eq:fwd-step}
+\end{align}
+
+\textbf{Backward substitution} ($i = m - 2, m - 3, \ldots, 0$):
+\begin{align}
+  x_{m-1} &= g_{m-1}, \label{eq:bwd-init} \\
+  x_i     &= g_i - \frac{x_{i+1}}{w_i}. \label{eq:bwd-step}
+\end{align}
+
+In the implementation (\texttt{tdma.py}), both sweeps are executed with
+\texttt{jax.lax.scan}, which provides a JIT-compatible sequential loop
+with $O(1)$ memory overhead per step.
+
+%----------------------------------------------------------------------
+\section{$N$-dimensional Tensor Product Spline}
+%----------------------------------------------------------------------
+
+For an $N$-dimensional rectilinear grid with axis-$d$ having $n_d$
+intervals and spacing $h_d = (b_d - a_d) / n_d$, the data tensor is:
+\begin{equation}\label{eq:data-tensor}
+  \mathcal{Y}_{k_1 k_2 \cdots k_N}
+  = f\!\left(x^{(1)}_{k_1},\, x^{(2)}_{k_2},\, \ldots,\, x^{(N)}_{k_N}\right).
+\end{equation}
+
+The tensor product spline interpolant is:
+\begin{equation}\label{eq:tensor-spline}
+  s(\mathbf{x})
+  = \sum_{i_1=0}^{n_1+2} \cdots \sum_{i_N=0}^{n_N+2}
+    \mathcal{C}_{i_1 \cdots i_N}
+    \prod_{d=1}^{N} B^{(d)}_{i_d}(x_d),
+\end{equation}
+where $B^{(d)}_{i_d}$ is the 1D B-spline basis for axis $d$, and
+$\mathcal{C}$ is the coefficient tensor of shape
+$(n_1+3) \times \cdots \times (n_N+3)$.
+
+The interpolation conditions $s(\mathbf{x}_{\mathbf{k}}) = \mathcal{Y}_{\mathbf{k}}$
+at all grid points, together with natural boundary conditions on each axis,
+yield the global linear system:
+\begin{equation}\label{eq:global-system}
+  \left(A^{(N)} \otimes \cdots \otimes A^{(2)} \otimes A^{(1)}\right)
+  \operatorname{vec}(\mathcal{C}_{\mathrm{int}})
+  = \operatorname{vec}(\mathcal{D}),
+\end{equation}
+where $\otimes$ denotes the Kronecker product, $A^{(d)}$ is the
+$(n_d - 1) \times (n_d - 1)$ tridiagonal matrix from \eqref{eq:tridiag}
+for axis $d$, $\mathcal{C}_{\mathrm{int}}$ denotes the interior
+coefficients, and $\mathcal{D}$ is the appropriately modified right-hand
+side tensor. Solving \eqref{eq:global-system} directly requires
+$O(M^{3N})$ operations, where $M = \max_d(n_d)$, which is prohibitive
+for large $N$.
+
+%----------------------------------------------------------------------
+\section{Efficient Coefficient Computation via Kronecker Factorization}
+%----------------------------------------------------------------------
+
+The Kronecker product structure of \eqref{eq:global-system} allows
+factorization into $N$ sequential 1D solves \cite{Habermann2007}. The key
+identity is:
+\begin{equation}\label{eq:kron-inv}
+  \left(A^{(N)} \otimes \cdots \otimes A^{(1)}\right)^{-1}
+  = \left(A^{(N)}\right)^{-1} \otimes \cdots \otimes \left(A^{(1)}\right)^{-1}.
+\end{equation}
+
+This means the coefficient tensor can be computed iteratively:
+\begin{align}
+  \mathcal{C}^{(0)} &= \mathcal{Y}, \label{eq:iter-init} \\
+  A^{(d)} \, \mathcal{C}^{(d)} &= \mathcal{C}^{(d-1)}
+    \quad (d = 1, 2, \ldots, N), \label{eq:iter-step} \\
+  \mathcal{C} &= \mathcal{C}^{(N)}. \label{eq:iter-final}
+\end{align}
+
+In \eqref{eq:iter-step}, the notation $A^{(d)}$ is used as shorthand for
+the full 1D spline solve operator along axis $d$, which includes not only
+the tridiagonal matrix solve (\eqref{eq:tridiag},
+\eqref{eq:fwd-init}--\eqref{eq:bwd-step}) but also the boundary condition
+computation (\eqref{eq:c1}--\eqref{eq:cn2}). Concretely, for each fixed
+combination of indices along all axes other than $d$, extract the 1D
+vector along axis $d$, apply the complete 1D solve procedure, and store
+the result.
+
+\textbf{Complexity analysis.}\quad At step $d$, the tensor has
+$\prod_{j \ne d} n_j$ independent 1D problems, each of size $O(n_d)$.
+The total cost is:
+\begin{equation}\label{eq:complexity}
+  \sum_{d=1}^{N} \left(\prod_{j \ne d} n_j\right) \cdot O(n_d)
+  = N \cdot O\!\left(\prod_{d=1}^{N} n_d\right)
+  = O(N M^N),
+\end{equation}
+where we used the approximation $n_d \approx M$ for all $d$. Compared to
+$O(M^{3N})$ for direct solve, this is a dramatic reduction.
+
+\textbf{Implementation} (\texttt{tdma.py}, \texttt{compute\_coefs}): The
+function iterates over each axis and calls \texttt{solve\_along\_axis},
+which transposes the target axis to the last position, reshapes into a 2D
+batch, applies \texttt{jax.vmap(solve\_1d\_spline)} over the batch
+dimension, and reshapes back. This avoids explicit Python loops over batch
+indices.
+
+%----------------------------------------------------------------------
+\section{Localized Evaluation}
+%----------------------------------------------------------------------
+
+Given a query point $\mathbf{x} \in \mathbb{R}^N$, due to the local
+support of B-splines (Section~2), the sum in \eqref{eq:tensor-spline}
+reduces to only $4^N$ nonzero terms. For each dimension $d$:
+
+\textbf{Step 1. Locate the interval}: compute the normalized coordinate
+$u_d = (x_d - a_d) / h_d$ and the interval index:
+\begin{equation}\label{eq:interval}
+  k_d = \operatorname{clip}\!\left(\lfloor u_d \rfloor,\; 0,\; n_d - 1\right).
+\end{equation}
+
+\textbf{Step 2. Compute local basis values}: define the fractional
+position $\tau_d = u_d - k_d \in [0, 1)$. The 4 nonzero basis values are:
+\begin{equation}\label{eq:local-basis}
+  \phi^{(d)}_0 = \beta(|\tau_d + 1|), \quad
+  \phi^{(d)}_1 = \beta(|\tau_d|), \quad
+  \phi^{(d)}_2 = \beta(|\tau_d - 1|), \quad
+  \phi^{(d)}_3 = \beta(|\tau_d - 2|),
+\end{equation}
+corresponding to coefficient indices $k_d, \; k_d+1, \; k_d+2, \; k_d+3$.
+
+\textbf{Step 3. Extract local coefficients}: use
+\texttt{jax.lax.dynamic\_slice} to extract the
+$\underbrace{4 \times 4 \times \cdots \times 4}_{N}$ sub-tensor:
+\begin{equation}\label{eq:local-coefs}
+  \mathcal{C}_{\mathrm{local}}
+  = \mathcal{C}[k_1 : k_1\!+\!4, \; k_2 : k_2\!+\!4, \; \ldots, \; k_N : k_N\!+\!4].
+\end{equation}
+
+\textbf{Step 4. Tensor contraction}: the interpolated value is:
+\begin{equation}\label{eq:eval}
+  s(\mathbf{x})
+  = \sum_{j_1=0}^{3} \cdots \sum_{j_N=0}^{3}
+    \mathcal{C}_{\mathrm{local},\, j_1 \cdots j_N}
+    \prod_{d=1}^{N} \phi^{(d)}_{j_d}.
+\end{equation}
+
+This is implemented as a sequence of tensor-vector contractions:
+\begin{align}
+  \mathcal{R}^{(0)} &= \mathcal{C}_{\mathrm{local}}, \label{eq:contract-init} \\
+  \mathcal{R}^{(d)} &= \sum_{j_d=0}^{3}
+    \mathcal{R}^{(d-1)}_{j_d, \ldots} \; \phi^{(d)}_{j_d},
+    \quad d = 1, \ldots, N, \label{eq:contract-step} \\
+  s(\mathbf{x}) &= \mathcal{R}^{(N)} \in \mathbb{R}. \label{eq:contract-final}
+\end{align}
+
+Each contraction reduces the tensor rank by one. This is implemented with
+\texttt{jnp.tensordot(result, basis, axes=([0], [0]))}.
+
+\textbf{Computational cost per evaluation}: $O(4^N)$ multiplications,
+independent of grid size.
+
+\textbf{Differentiability}: Because \texttt{dynamic\_slice} and all
+arithmetic operations are JAX primitives, the entire evaluation is
+compatible with \texttt{jax.grad} for automatic differentiation.
+
+%----------------------------------------------------------------------
+\section{Implementation Mapping}
+%----------------------------------------------------------------------
+
+\begin{longtable}{@{} p{5cm} p{5.5cm} p{4cm} @{}}
+\toprule
+Theory & Implementation & File \\
+\midrule
+\endhead
+B-spline basis $\beta(t)$, \eqref{eq:beta}
+  & \texttt{\_basis\_fn(t)}
+  & \texttt{interpolant.py} \\
+Boundary conditions, \eqref{eq:c1}--\eqref{eq:cn2}
+  & \texttt{solve\_1d\_spline(y\_data)}
+  & \texttt{tdma.py} \\
+TDMA forward/backward, \eqref{eq:fwd-init}--\eqref{eq:bwd-step}
+  & \texttt{tdma\_solve(rhs)}
+  & \texttt{tdma.py} \\
+Sequential axis solve, \eqref{eq:iter-init}--\eqref{eq:iter-final}
+  & \texttt{compute\_coefs(ndim, y\_data)}
+  & \texttt{tdma.py} \\
+Batched 1D solve via \texttt{vmap}
+  & \texttt{solve\_along\_axis(data, axis)}
+  & \texttt{tdma.py} \\
+Interval location, \eqref{eq:interval}
+  & \texttt{\_local\_index\_and\_basis(\ldots)}
+  & \texttt{interpolant.py} \\
+Local basis values, \eqref{eq:local-basis}
+  & \texttt{\_local\_index\_and\_basis(\ldots)}
+  & \texttt{interpolant.py} \\
+Local coefficient extraction, \eqref{eq:local-coefs}
+  & \texttt{lax.dynamic\_slice(c, \ldots)}
+  & \texttt{interpolant.py} \\
+Tensor contraction, \eqref{eq:eval}--\eqref{eq:contract-final}
+  & \texttt{jnp.tensordot} loop
+  & \texttt{interpolant.py} \\
+\bottomrule
+\end{longtable}
+
+%----------------------------------------------------------------------
+\section{References}
+%----------------------------------------------------------------------
+
+\begin{thebibliography}{9}
+\bibitem{Habermann2007}
+  C.~Habermann and F.~Kindermann,
+  ``Multidimensional Spline Interpolation: Theory and Applications,''
+  \emph{Computational Economics}, vol.~30, no.~2, pp.~153--169, 2007.
+  DOI: \href{https://doi.org/10.1007/s10614-007-9092-4}{10.1007/s10614-007-9092-4}.
+
+\bibitem{deBoor1978}
+  C.~de~Boor,
+  \emph{A Practical Guide to Splines},
+  Springer, 1978.
+
+\bibitem{JAX}
+  JAX Reference Documentation:
+  \url{https://jax.readthedocs.io/en/latest/}.
+\end{thebibliography}
+
+\bigskip
+\noindent\textbf{Acknowledgment.}\quad
+This document was prepared with the assistance of Claude (Anthropic).
+The author assumes full responsibility for the content.
+
+\end{document}

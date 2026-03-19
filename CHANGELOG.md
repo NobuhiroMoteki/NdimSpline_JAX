@@ -4,9 +4,10 @@
 
 ### Added
 - `ndim_spline_jax` package with JAX-native implementation:
-  - `compute_coefs`: Tensor-product TDMA solver for N-dim coefficient computation — O(N M^{N+1})
-  - `make_interpolant`: Localized evaluation via `dynamic_slice` — only 4^N coefficients per query
-- `technical_note_theory.md`: Self-contained mathematical derivation (Eq. 1–23)
+  - `compute_coefs`: Tensor-product TDMA solver for N-dim coefficient computation — O(N·M<sup>N+1</sup>)
+  - `make_interpolant`: Localized evaluation via `dynamic_slice` — only 4<sup>N</sup> coefficients per query
+- `docs/theory_note.tex` / `docs/theory_note.pdf`: LaTeX technical note with full mathematical derivation
+- `technical_note_theory.md`: Markdown version of the technical note
 - `benchmark.py`: Reproducible time + memory benchmark script
 - `pyproject.toml`: Package metadata
 - `tests/`: 42 pytest tests covering correctness, gradients, JIT compatibility, and boundary evaluation

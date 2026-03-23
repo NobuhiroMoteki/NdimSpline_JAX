@@ -195,8 +195,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## Contact
 Nobuhiro Moteki - nobuhiro.moteki@gmail.com
 
-Project Link: [https://github.com/nmoteki/ndimsplinejax.git](https://github.com/nmoteki/ndimsplinejax.git)
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 

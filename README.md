@@ -27,7 +27,9 @@
   </a>
   <h3 align="center">NdimSpline_JAX</h3>
   A multidimensional spline interpolation by Google/JAX
-  
+
+[![Latest Release](https://img.shields.io/github/v/release/NobuhiroMoteki/NdimSpline_JAX)](https://github.com/NobuhiroMoteki/NdimSpline_JAX/releases/latest)
+
 <br />
 <br />
 

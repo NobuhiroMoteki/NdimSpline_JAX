@@ -116,6 +116,8 @@ This is an example of how you use the modules on your local computer. The author
    ```sh
    git clone https://github.com/NobuhiroMoteki/NdimSpline_JAX.git
    ```
+For a step-by-step environment setup on Windows (WSL2 + Ubuntu) and native Linux (Ubuntu) machines, see **[installation_guide.md](installation_guide.md)**.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Usage
